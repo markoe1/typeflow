@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeFlow - Test Your Typing Speed</title>
+    <meta name="description" content="Improve your typing speed and accuracy with TypeFlow. Practice typing with our free online typing test and lessons.">
+    
+    <!-- AdSense Code (placeholder - replace XXXXXXXXXX with real client ID after approval) -->
+    <script async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX"
+        crossorigin="anonymous"></script>
+    
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <span class="icon">⌨️</span>
+            <span>TypeFlow</span>
+        </a>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link active">Test</a>
+            <a href="practice.html" class="nav-link">Practice</a>
+            <a href="lessons.html" class="nav-link">Lessons</a>
+        </div>
+        
+        <div class="theme-selector">
+            <button class="theme-btn theme-dark" data-theme="dark" title="Dark Theme"></button>
+            <button class="theme-btn theme-light" data-theme="light" title="Light Theme"></button>
+            <button class="theme-btn theme-retro" data-theme="retro" title="Retro Theme"></button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Test Your <span class="highlight">Typing Speed</span></h1>
+            <p>Choose your difficulty, set the timer, and start typing. See how fast you really are.</p>
+        </div>
+
+        <!-- AdSense Leaderboard -->
+        <div class="ad-unit ad-leaderboard">
+            <!-- AdSense 728x90 -->
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <!-- Mode Toggle -->
+            <div class="control-group">
+                <button class="toggle active" data-mode="time" id="timeMode">Time</button>
+                <button class="toggle" data-mode="words" id="wordsMode">Words</button>
+            </div>
+
+            <!-- Time Options -->
+            <div class="control-group" id="timeOptions">
+                <button class="toggle" data-time="15">15s</button>
+                <button class="toggle active" data-time="30">30s</button>
+                <button class="toggle" data-time="60">60s</button>
+                <button class="toggle" data-time="120">120s</button>
+            </div>
+
+            <!-- Word Options -->
+            <div class="control-group hidden" id="wordOptions">
+                <button class="toggle" data-words="10">10</button>
+                <button class="toggle active" data-words="25">25</button>
+                <button class="toggle" data-words="50">50</button>
+                <button class="toggle" data-words="100">100</button>
+            </div>
+
+            <!-- Difficulty -->
+            <div class="control-group">
+                <button class="toggle" data-difficulty="easy">Easy</button>
+                <button class="toggle active" data-difficulty="medium">Medium</button>
+                <button class="toggle" data-difficulty="hard">Hard</button>
+            </div>
+
+            <!-- Reset -->
+            <button class="reset-btn" id="resetBtn" title="Reset">🔄</button>
+        </div>
+
+        <!-- Timer Display -->
+        <div class="timer">
+            <div class="timer-display" id="timerDisplay">30</div>
+            <p>seconds</p>
+        </div>
+
+        <!-- Typing Area -->
+        <div class="typing-card" id="typingCard">
+            <div class="typing-text" id="typingText">
+                <span class="char">c</span><span class="char">l</span><span class="char">i</span><span class="char">c</span><span class="char">k</span><span class="char"> </span><span class="char">h</span><span class="char">e</span><span class="char">r</span><span class="char">e</span><span class="char"> </span><span class="char">t</span><span class="char">o</span><span class="char"> </span><span class="char">s</span><span class="char">t</span><span class="char">a</span><span class="char">r</span><span class="char">t</span>
+            </div>
+            <input type="text" class="typing-input" id="typingInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results hide" id="results">
+            <div class="wpm-display" id="wpmResult">0</div>
+            <p>Words Per Minute</p>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="accuracyResult">0%</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="correctWordsResult">0</div>
+                    <div class="stat-label">Correct</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="totalWordsResult">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="errorsResult">0</div>
+                    <div class="stat-label">Errors</div>
+                </div>
+            </div>
+            
+            <button class="btn primary" id="tryAgainBtn">Try Again</button>
+        </div>
+
+        <!-- AdSense Rectangle (after results) -->
+        <div class="ad-unit ad-rectangle">
+            <!-- AdSense 300x250 -->
+        </div>
+
+        <!-- Action Cards -->
+        <div class="action-cards">
+            <a href="lessons.html" class="action-card">
+                <span class="icon">📚</span>
+                <h3>Typing Lessons</h3>
+                <p>Learn proper finger placement and build real muscle memory with structured lessons.</p>
+            </a>
+            <a href="practice.html" class="action-card">
+                <span class="icon">⚡</span>
+                <h3>Practice Mode</h3>
+                <p>No timer, no pressure. Just pure practice to sharpen your typing skills at your pace.</p>
+            </a>
+        </div>
+
+        <!-- AdSense Footer Banner -->
+        <div class="ad-unit ad-leaderboard">
+            <!-- AdSense 728x90 -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/themes.js"></script>
+    <script src="js/typing-test.js"></script>
+</body>
+</html>

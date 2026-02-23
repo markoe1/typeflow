@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeFlow - Lesson</title>
+    <meta name="description" content="Master typing fundamentals with structured lessons designed to build muscle memory and improve accuracy.">
+    
+    <!-- AdSense Code (placeholder - replace XXXXXXXXXX with real client ID after approval) -->
+    <script async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX"
+        crossorigin="anonymous"></script>
+    
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <span class="icon">⌨️</span>
+            <span>TypeFlow</span>
+        </a>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Test</a>
+            <a href="practice.html" class="nav-link">Practice</a>
+            <a href="lessons.html" class="nav-link active">Lessons</a>
+        </div>
+        
+        <div class="theme-selector">
+            <button class="theme-btn theme-dark" data-theme="dark" title="Dark Theme"></button>
+            <button class="theme-btn theme-light" data-theme="light" title="Light Theme"></button>
+            <button class="theme-btn theme-retro" data-theme="retro" title="Retro Theme"></button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Back Button -->
+        <a href="lessons.html" class="back-btn">
+            ← Back to lessons
+        </a>
+
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1 id="lessonTitle">Lesson 1: Home Row Keys</h1>
+            <p id="lessonDescription">Master the foundation of touch typing with the home row keys: A S D F J K L ;</p>
+            <p><strong>Required mastery: 90%</strong></p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        <p class="text-center mb-2" id="progressText">Accuracy: 0%</p>
+
+        <!-- Typing Area -->
+        <div class="typing-card" id="typingCard">
+            <div class="typing-text" id="typingText">
+                <span class="char">c</span><span class="char">l</span><span class="char">i</span><span class="char">c</span><span class="char">k</span><span class="char"> </span><span class="char">h</span><span class="char">e</span><span class="char">r</span><span class="char">e</span><span class="char"> </span><span class="char">t</span><span class="char">o</span><span class="char"> </span><span class="char">s</span><span class="char">t</span><span class="char">a</span><span class="char">r</span><span class="char">t</span>
+            </div>
+            <input type="text" class="typing-input" id="typingInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+
+        <!-- Lesson Complete Screen -->
+        <div class="results hide" id="lessonComplete">
+            <h2>Lesson Complete!</h2>
+            <div class="wpm-display" id="finalAccuracy">85%</div>
+            <p>accuracy</p>
+            
+            <div id="completionMessage" class="mb-2">
+                <p>Keep practicing to reach 90% accuracy and unlock the next lesson!</p>
+            </div>
+            
+            <div class="flex gap-1 justify-center">
+                <button class="btn primary" id="tryAgainBtn">Try Again</button>
+                <button class="btn secondary hidden" id="nextLessonBtn">Next Lesson →</button>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="reset-btn" id="resetBtn" title="Reset">🔄</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/themes.js"></script>
+    <script>
+        // Inline lesson detail logic to keep it simple
+        class LessonDetail {
+          constructor() {
+            this.currentLesson = this.getLessonFromURL();
+            this.currentIndex = 0;
+            this.correctChars = 0;
+            this.totalChars = 0;
+            this.currentText = '';
+            this.hasCompleted = false;
+            
+            // Lesson content from the PDF specifications
+            this.lessonContent = {
+              1: {
+                title: "Lesson 1: Home Row Keys",
+                description: "Master the foundation of touch typing with the home row keys: A S D F J K L ;",
+                text: "asdf jkl; asdf jkl; fjdk sl;a fj dk sl ;a asdf jkl; fjdk asdf"
+              },
+              2: {
+                title: "Lesson 2: Top Row Keys", 
+                description: "Learn keys reachable to the top row: Q W E R T Y U I O P",
+                text: "qwer tyui op qw er ty ui op qwerty uiop qwer tyuiop"
+              },
+              3: {
+                title: "Lesson 3: Bottom Row Keys",
+                description: "Complete your keyboard coverage with the bottom row: Z X C V B N M", 
+                text: "zxcv bnm zx cv bn m zxcv bnm zxcvbnm"
+              },
+              4: {
+                title: "Lesson 4: Numbers Row",
+                description: "Practice the number keys across the top of your keyboard",
+                text: "1234 5678 90 12 34 56 78 90 1234567890"
+              },
+              5: {
+                title: "Lesson 5: Common Words",
+                description: "Build speed with the most frequently used English words",
+                text: "the and for are but not you all can had her was one our out day get has him his how man new now old see two way who"
+              },
+              6: {
+                title: "Lesson 6: Capital Letters",
+                description: "Practice using the Shift key for capital letters", 
+                text: "The Quick Brown Fox Jumps Over The Lazy Dog"
+              },
+              7: {
+                title: "Lesson 7: Punctuation",
+                description: "Master punctuation marks in your typing",
+                text: "Hello, world! How are you? Fine, thanks. It's great."
+              },
+              8: {
+                title: "Lesson 8: Full Sentences", 
+                description: "Put it all together with complete sentences at speed",
+                text: "The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs."
+              }
+            };
+            
+            this.init();
+          }
+          
+          getLessonFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return parseInt(params.get('lesson')) || 1;
+          }
+          
+          init() {
+            this.setupElements();
+            this.setupEventListeners();
+            this.loadLesson();
+          }
+          
+          setupElements() {
+            this.elements = {
+              lessonTitle: document.getElementById('lessonTitle'),
+              lessonDescription: document.getElementById('lessonDescription'),
+              progressBar: document.getElementById('progressBar'),
+              progressFill: document.getElementById('progressFill'),
+              progressText: document.getElementById('progressText'),
+              typingCard: document.getElementById('typingCard'),
+              typingText: document.getElementById('typingText'),
+              typingInput: document.getElementById('typingInput'),
+              lessonComplete: document.getElementById('lessonComplete'),
+              finalAccuracy: document.getElementById('finalAccuracy'),
+              completionMessage: document.getElementById('completionMessage'),
+              tryAgainBtn: document.getElementById('tryAgainBtn'),
+              nextLessonBtn: document.getElementById('nextLessonBtn'),
+              resetBtn: document.getElementById('resetBtn')
+            };
+          }
+          
+          setupEventListeners() {
+            this.elements.typingInput.addEventListener('input', (e) => this.handleInput(e));
+            this.elements.typingInput.addEventListener('focus', () => this.elements.typingCard.classList.add('focused'));
+            this.elements.typingInput.addEventListener('blur', () => this.elements.typingCard.classList.remove('focused'));
+            this.elements.typingCard.addEventListener('click', () => this.elements.typingInput.focus());
+            this.elements.resetBtn.addEventListener('click', () => this.reset());
+            this.elements.tryAgainBtn.addEventListener('click', () => this.reset());
+            this.elements.nextLessonBtn.addEventListener('click', () => this.goToNextLesson());
+            
+            setTimeout(() => this.elements.typingInput.focus(), 100);
+          }
+          
+          loadLesson() {
+            const lesson = this.lessonContent[this.currentLesson];
+            if (!lesson) return;
+            
+            this.elements.lessonTitle.textContent = lesson.title;
+            this.elements.lessonDescription.textContent = lesson.description;
+            this.currentText = lesson.text;
+            this.displayText();
+          }
+          
+          displayText() {
+            const textElement = this.elements.typingText;
+            textElement.innerHTML = '';
+            
+            for (let i = 0; i < this.currentText.length; i++) {
+              const span = document.createElement('span');
+              span.classList.add('char');
+              span.textContent = this.currentText[i];
+              
+              if (i < this.currentIndex) {
+                const inputValue = this.elements.typingInput.value;
+                if (i < inputValue.length) {
+                  if (inputValue[i] === this.currentText[i]) {
+                    span.classList.add('correct');
+                  } else {
+                    span.classList.add('incorrect');
+                  }
+                }
+              } else if (i === this.currentIndex) {
+                span.classList.add('current');
+              }
+              
+              textElement.appendChild(span);
+            }
+          }
+          
+          handleInput(e) {
+            const inputValue = e.target.value;
+            
+            if (inputValue.length > this.currentIndex + 1) {
+              e.target.value = inputValue.substring(0, this.currentIndex + 1);
+              return;
+            }
+            
+            if (inputValue.length === this.currentIndex + 1) {
+              const currentChar = this.currentText[this.currentIndex];
+              const typedChar = inputValue[inputValue.length - 1];
+              
+              this.totalChars++;
+              const charElement = this.elements.typingText.children[this.currentIndex];
+              
+              if (typedChar === currentChar) {
+                charElement.classList.add('correct');
+                this.correctChars++;
+              } else {
+                charElement.classList.add('incorrect');
+              }
+              
+              charElement.classList.remove('current');
+              this.currentIndex++;
+              
+              if (this.currentIndex < this.currentText.length) {
+                this.elements.typingText.children[this.currentIndex].classList.add('current');
+              }
+              
+              this.updateProgress();
+              
+              if (this.currentIndex >= this.currentText.length) {
+                this.completeLesson();
+              }
+              
+            } else if (inputValue.length === this.currentIndex) {
+              if (this.currentIndex > 0) {
+                const charElement = this.elements.typingText.children[this.currentIndex - 1];
+                const wasCorrect = charElement.classList.contains('correct');
+                
+                charElement.classList.remove('correct', 'incorrect');
+                
+                if (wasCorrect) {
+                  this.correctChars--;
+                }
+                this.totalChars--;
+                
+                const currentElement = this.elements.typingText.children[this.currentIndex];
+                if (currentElement) {
+                  currentElement.classList.remove('current');
+                }
+                
+                this.currentIndex--;
+                this.elements.typingText.children[this.currentIndex].classList.add('current');
+                
+                this.updateProgress();
+              }
+            }
+          }
+          
+          updateProgress() {
+            const accuracy = this.totalChars > 0 ? Math.round((this.correctChars / this.totalChars) * 100) : 100;
+            const completionProgress = Math.round((this.currentIndex / this.currentText.length) * 100);
+            
+            this.elements.progressFill.style.width = completionProgress + '%';
+            this.elements.progressText.textContent = `Accuracy: ${accuracy}%`;
+          }
+          
+          completeLesson() {
+            if (this.hasCompleted) return;
+            this.hasCompleted = true;
+            
+            const accuracy = this.totalChars > 0 ? Math.round((this.correctChars / this.totalChars) * 100) : 100;
+            
+            this.elements.finalAccuracy.textContent = accuracy + '%';
+            
+            if (accuracy >= 90) {
+              this.elements.completionMessage.innerHTML = '<p style="color: var(--correct);">Excellent! You have mastered this lesson!</p>';
+              
+              if (this.currentLesson < 8) {
+                this.elements.nextLessonBtn.classList.remove('hidden');
+              }
+              
+              // Save progress using lessons manager if available
+              if (window.lessonsManager) {
+                window.lessonsManager.completeLesson(this.currentLesson, accuracy);
+              } else {
+                // Fallback localStorage save
+                this.saveLessonProgress(accuracy);
+              }
+            } else {
+              this.elements.completionMessage.innerHTML = '<p>Keep practicing to reach 90% accuracy and unlock the next lesson!</p>';
+            }
+            
+            this.elements.lessonComplete.classList.remove('hide');
+            this.elements.lessonComplete.classList.add('show');
+            this.elements.typingCard.style.display = 'none';
+          }
+          
+          saveLessonProgress(accuracy) {
+            const progress = JSON.parse(localStorage.getItem('typeflow-lessons-progress') || '{"completed":[],"scores":{}}');
+            progress.scores[this.currentLesson] = accuracy;
+            
+            if (accuracy >= 90 && !progress.completed.includes(this.currentLesson)) {
+              progress.completed.push(this.currentLesson);
+            }
+            
+            localStorage.setItem('typeflow-lessons-progress', JSON.stringify(progress));
+          }
+          
+          goToNextLesson() {
+            window.location.href = `lesson-detail.html?lesson=${this.currentLesson + 1}`;
+          }
+          
+          reset() {
+            this.currentIndex = 0;
+            this.correctChars = 0;
+            this.totalChars = 0;
+            this.hasCompleted = false;
+            
+            this.elements.typingInput.value = '';
+            this.elements.lessonComplete.classList.remove('show');
+            this.elements.lessonComplete.classList.add('hide');
+            this.elements.typingCard.style.display = 'block';
+            
+            this.displayText();
+            this.updateProgress();
+            
+            setTimeout(() => this.elements.typingInput.focus(), 100);
+          }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+          window.lessonDetail = new LessonDetail();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeFlow - Practice Mode</title>
+    <meta name="description" content="Practice typing without pressure. No timer, just pure practice to improve your typing skills at your own pace.">
+    
+    <!-- AdSense Code (placeholder - replace XXXXXXXXXX with real client ID after approval) -->
+    <script async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX"
+        crossorigin="anonymous"></script>
+    
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <span class="icon">⌨️</span>
+            <span>TypeFlow</span>
+        </a>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Test</a>
+            <a href="practice.html" class="nav-link active">Practice</a>
+            <a href="lessons.html" class="nav-link">Lessons</a>
+        </div>
+        
+        <div class="theme-selector">
+            <button class="theme-btn theme-dark" data-theme="dark" title="Dark Theme"></button>
+            <button class="theme-btn theme-light" data-theme="light" title="Light Theme"></button>
+            <button class="theme-btn theme-retro" data-theme="retro" title="Retro Theme"></button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Practice Mode</h1>
+            <p>No timer. No pressure. Just practice.</p>
+        </div>
+
+        <!-- AdSense Leaderboard -->
+        <div class="ad-unit ad-leaderboard">
+            <!-- AdSense 728x90 -->
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <!-- Difficulty -->
+            <div class="control-group">
+                <button class="toggle" data-difficulty="easy">Easy</button>
+                <button class="toggle active" data-difficulty="medium">Medium</button>
+                <button class="toggle" data-difficulty="hard">Hard</button>
+            </div>
+
+            <!-- Reset -->
+            <button class="reset-btn" id="resetBtn" title="Reset">🔄</button>
+        </div>
+
+        <!-- Accuracy Display -->
+        <div class="accuracy-display">
+            <div class="accuracy-value" id="accuracyDisplay">100%</div>
+            <p>accuracy</p>
+        </div>
+
+        <!-- Typing Area -->
+        <div class="typing-card" id="typingCard">
+            <div class="typing-text" id="typingText">
+                <span class="char">c</span><span class="char">l</span><span class="char">i</span><span class="char">c</span><span class="char">k</span><span class="char"> </span><span class="char">h</span><span class="char">e</span><span class="char">r</span><span class="char">e</span><span class="char"> </span><span class="char">t</span><span class="char">o</span><span class="char"> </span><span class="char">s</span><span class="char">t</span><span class="char">a</span><span class="char">r</span><span class="char">t</span>
+            </div>
+            <input type="text" class="typing-input" id="typingInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+
+        <!-- AdSense Rectangle -->
+        <div class="ad-unit ad-rectangle">
+            <!-- AdSense 300x250 -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/themes.js"></script>
+    <script src="js/practice.js"></script>
+</body>
+</html>
