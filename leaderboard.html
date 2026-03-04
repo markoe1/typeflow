@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeFlow Leaderboard - Top Typing Speeds</title>
+    <meta name="description" content="Track your personal typing speed records on TypeFlow. Save your best WPM scores and watch your progress over time.">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHB7GDRCB2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-QHB7GDRCB2');
+    </script>
+    
+    <meta name="google-adsense-account" content="ca-pub-3527398386713452">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3527398386713452"
+         crossorigin="anonymous"></script>
+    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <span class="icon">⌨️</span>
+            <span>TypeFlow</span>
+        </a>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Test</a>
+            <a href="practice.html" class="nav-link">Practice</a>
+            <a href="lessons.html" class="nav-link">Lessons</a>
+            <a href="leaderboard.html" class="nav-link active">Leaderboard</a>
+        </div>
+        
+        <div class="theme-selector">
+            <button class="theme-btn theme-dark" data-theme="dark" title="Dark Theme"></button>
+            <button class="theme-btn theme-light" data-theme="light" title="Light Theme"></button>
+            <button class="theme-btn theme-retro" data-theme="retro" title="Retro Theme"></button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>🏆 TypeFlow Leaderboard</h1>
+            <p>The fastest typists on TypeFlow. Think you can make the top 10?</p>
+        </div>
+
+        <!-- Add Score Section -->
+        <div class="card" id="addScoreSection">
+            <h2>Add Your Score</h2>
+            <p>Save your best scores and track your personal progress over time. Scores are stored on this device.</p>
+            
+            <div class="score-form">
+                <input type="text" id="nicknameInput" placeholder="Enter your nickname" maxlength="20">
+                <input type="number" id="wpmInput" placeholder="WPM" min="1" max="300">
+                <input type="number" id="accuracyInput" placeholder="Accuracy %" min="1" max="100">
+                <button class="btn primary" id="addScoreBtn">Add Score</button>
+            </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="card">
+            <h2>🥇 Your Best Scores</h2>
+            <div class="leaderboard" id="leaderboard">
+                <div class="leaderboard-header">
+                    <div class="rank">#</div>
+                    <div class="nickname">Typist</div>
+                    <div class="wpm">WPM</div>
+                    <div class="accuracy">Accuracy</div>
+                    <div class="date">Date</div>
+                </div>
+                
+                <!-- Leaderboard entries will be populated here -->
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="action-cards">
+            <a href="index.html" class="action-card">
+                <span class="icon">🎯</span>
+                <h3>Take Speed Test</h3>
+                <p>Test your typing speed and try to make the leaderboard!</p>
+            </a>
+            <a href="lessons.html" class="action-card">
+                <span class="icon">📚</span>
+                <h3>Improve with Lessons</h3>
+                <p>Practice with structured lessons to boost your WPM.</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/themes.js"></script>
+    <script>
+        class Leaderboard {
+            constructor() {
+                this.init();
+            }
+            
+            init() {
+                this.loadLeaderboard();
+                this.setupEventListeners();
+            }
+            
+            setupEventListeners() {
+                document.getElementById('addScoreBtn').addEventListener('click', () => {
+                    this.addScore();
+                });
+                
+                // Enter key support
+                ['nicknameInput', 'wpmInput', 'accuracyInput'].forEach(id => {
+                    document.getElementById(id).addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            this.addScore();
+                        }
+                    });
+                });
+            }
+            
+            loadLeaderboard() {
+                const scores = this.getScores();
+                this.displayScores(scores);
+            }
+            
+            getScores() {
+                const saved = localStorage.getItem('typeflow-leaderboard');
+                const scores = saved ? JSON.parse(saved) : [];
+                
+                // Add some demo scores if empty
+                if (scores.length === 0) {
+                    scores.push(
+                        { nickname: "SpeedDemon", wpm: 127, accuracy: 98, date: "2026-02-24" },
+                        { nickname: "KeyboardNinja", wpm: 115, accuracy: 96, date: "2026-02-23" },
+                        { nickname: "TypeMaster", wpm: 108, accuracy: 99, date: "2026-02-22" },
+                        { nickname: "FastFingers", wpm: 102, accuracy: 94, date: "2026-02-21" },
+                        { nickname: "TypingPro", wpm: 95, accuracy: 97, date: "2026-02-20" }
+                    );
+                    this.saveScores(scores);
+                }
+                
+                return scores.sort((a, b) => b.wpm - a.wpm);
+            }
+            
+            saveScores(scores) {
+                localStorage.setItem('typeflow-leaderboard', JSON.stringify(scores));
+            }
+            
+            addScore() {
+                const nickname = document.getElementById('nicknameInput').value.trim();
+                const wpm = parseInt(document.getElementById('wpmInput').value);
+                const accuracy = parseInt(document.getElementById('accuracyInput').value);
+                
+                if (!nickname || !wpm || !accuracy) {
+                    this.showMessage('Please fill in all fields!', 'error');
+                    return;
+                }
+                
+                if (nickname.length > 20) {
+                    this.showMessage('Nickname must be 20 characters or less!', 'error');
+                    return;
+                }
+                
+                if (wpm < 1 || wpm > 300) {
+                    this.showMessage('WPM must be between 1 and 300!', 'error');
+                    return;
+                }
+                
+                if (accuracy < 1 || accuracy > 100) {
+                    this.showMessage('Accuracy must be between 1 and 100%!', 'error');
+                    return;
+                }
+                
+                const scores = this.getScores();
+                const newScore = {
+                    nickname: nickname,
+                    wpm: wpm,
+                    accuracy: accuracy,
+                    date: new Date().toISOString().split('T')[0]
+                };
+                
+                scores.push(newScore);
+                scores.sort((a, b) => b.wpm - a.wpm);
+                
+                // Keep only top 50 scores
+                if (scores.length > 50) {
+                    scores.splice(50);
+                }
+                
+                this.saveScores(scores);
+                this.displayScores(scores);
+                
+                // Clear form
+                document.getElementById('nicknameInput').value = '';
+                document.getElementById('wpmInput').value = '';
+                document.getElementById('accuracyInput').value = '';
+                
+                this.showMessage('Score added successfully! 🎉', 'success');
+                
+                // Highlight the new entry
+                setTimeout(() => {
+                    const newIndex = scores.findIndex(s => 
+                        s.nickname === newScore.nickname && 
+                        s.wpm === newScore.wpm && 
+                        s.accuracy === newScore.accuracy
+                    );
+                    const entry = document.querySelector(`[data-index="${newIndex}"]`);
+                    if (entry) {
+                        entry.style.background = 'var(--accent-primary)';
+                        entry.style.color = '#000';
+                        setTimeout(() => {
+                            entry.style.background = '';
+                            entry.style.color = '';
+                        }, 2000);
+                    }
+                }, 100);
+            }
+            
+            displayScores(scores) {
+                const container = document.getElementById('leaderboard');
+                const header = container.querySelector('.leaderboard-header');
+                
+                // Clear existing entries
+                const entries = container.querySelectorAll('.leaderboard-entry');
+                entries.forEach(entry => entry.remove());
+                
+                scores.slice(0, 25).forEach((score, index) => {
+                    const entry = document.createElement('div');
+                    entry.className = 'leaderboard-entry';
+                    entry.dataset.index = index;
+                    
+                    let rankIcon = index + 1;
+                    if (index === 0) rankIcon = '🥇';
+                    else if (index === 1) rankIcon = '🥈';
+                    else if (index === 2) rankIcon = '🥉';
+                    
+                    entry.innerHTML = `
+                        <div class="rank">${rankIcon}</div>
+                        <div class="nickname">${this.escapeHtml(score.nickname)}</div>
+                        <div class="wpm">${score.wpm}</div>
+                        <div class="accuracy">${score.accuracy}%</div>
+                        <div class="date">${score.date}</div>
+                    `;
+                    
+                    container.appendChild(entry);
+                });
+                
+                if (scores.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.className = 'empty-leaderboard';
+                    empty.textContent = 'No scores yet. Be the first!';
+                    container.appendChild(empty);
+                }
+            }
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            showMessage(text, type) {
+                const message = document.createElement('div');
+                message.className = `message ${type}`;
+                message.textContent = text;
+                message.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; z-index: 1000;
+                    padding: 1rem; border-radius: 6px; font-weight: 600;
+                    background: ${type === 'success' ? 'var(--correct)' : 'var(--error)'};
+                    color: #000;
+                `;
+                
+                document.body.appendChild(message);
+                setTimeout(() => message.remove(), 4000);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            new Leaderboard();
+        });
+    </script>
+    
+    <style>
+        .score-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .score-form input {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: inherit;
+            min-width: 120px;
+        }
+        
+        .score-form input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        .leaderboard {
+            margin-top: 1rem;
+        }
+        
+        .leaderboard-header,
+        .leaderboard-entry {
+            display: grid;
+            grid-template-columns: 60px 1fr 80px 100px 100px;
+            gap: 1rem;
+            padding: 1rem;
+            align-items: center;
+        }
+        
+        .leaderboard-header {
+            background: var(--bg-primary);
+            font-weight: 600;
+            border-radius: 6px;
+            color: var(--accent-primary);
+        }
+        
+        .leaderboard-entry {
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        
+        .leaderboard-entry:hover {
+            background: var(--bg-primary);
+        }
+        
+        .rank {
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .wpm {
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+        
+        .empty-leaderboard {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .leaderboard-header,
+            .leaderboard-entry {
+                grid-template-columns: 50px 1fr 60px 80px;
+                font-size: 0.9rem;
+            }
+            
+            .date {
+                display: none;
+            }
+            
+            .score-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .score-form input {
+                min-width: auto;
+            }
+        }
+    </style>
+</body>
+</html>
