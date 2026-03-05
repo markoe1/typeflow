@@ -316,6 +316,9 @@ class TypingTest {
     this.elements.totalWordsResult.textContent = this.results.totalWords;
     this.elements.errorsResult.textContent = this.results.errors;
     
+    // Add share functionality
+    this.addShareButton();
+    
     // Hide typing area
     this.elements.typingCard.style.display = 'none';
   }
@@ -359,6 +362,106 @@ class TypingTest {
       const progress = Math.min(100, (this.currentIndex / this.currentText.length) * 100);
       this.elements.timerDisplay.textContent = Math.round(progress) + '%';
     }
+  }
+
+  addShareButton() {
+    // Check if share button already exists
+    if (document.getElementById('shareBtn')) return;
+    
+    const shareBtn = document.createElement('button');
+    shareBtn.id = 'shareBtn';
+    shareBtn.className = 'btn secondary';
+    shareBtn.textContent = '📱 Share Score';
+    shareBtn.style.marginLeft = '1rem';
+    
+    shareBtn.addEventListener('click', () => {
+      this.shareScore();
+    });
+    
+    // Add to results section
+    const tryAgainBtn = this.elements.tryAgainBtn;
+    tryAgainBtn.parentNode.insertBefore(shareBtn, tryAgainBtn.nextSibling);
+  }
+  
+  shareScore() {
+    const shareText = `🎯 I just typed ${this.results.wpm} WPM with ${this.results.accuracy}% accuracy on TypeFlow!\n\nCan you beat my score? Try it free: https://markoe1.github.io/typeflow/\n\n#typing #productivity #TypeFlow`;
+    
+    // Try native sharing first (mobile)
+    if (navigator.share) {
+      navigator.share({
+        title: 'My TypeFlow Score',
+        text: shareText,
+        url: 'https://markoe1.github.io/typeflow/'
+      }).catch(err => {
+        console.log('Error sharing:', err);
+        this.fallbackShare(shareText);
+      });
+    } else {
+      this.fallbackShare(shareText);
+    }
+  }
+  
+  fallbackShare(text) {
+    // Copy to clipboard
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        this.showShareSuccess('Score copied to clipboard!');
+      }).catch(() => {
+        this.showShareTextbox(text);
+      });
+    } else {
+      this.showShareTextbox(text);
+    }
+  }
+  
+  showShareTextbox(text) {
+    // Create modal with text to copy
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8); display: flex; align-items: center;
+      justify-content: center; z-index: 1000;
+    `;
+    
+    const content = document.createElement('div');
+    content.style.cssText = `
+      background: var(--bg-card); padding: 2rem; border-radius: 12px;
+      max-width: 500px; width: 90%;
+    `;
+    
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.cssText = `
+      width: 100%; height: 150px; margin: 1rem 0;
+      padding: 1rem; border: 1px solid var(--border);
+      border-radius: 6px; font-family: inherit;
+      background: var(--bg-primary); color: var(--text-primary);
+    `;
+    textarea.select();
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Close';
+    closeBtn.className = 'btn primary';
+    closeBtn.onclick = () => modal.remove();
+    
+    content.innerHTML = '<h3>Share Your Score</h3><p>Copy and paste this text:</p>';
+    content.appendChild(textarea);
+    content.appendChild(closeBtn);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+  }
+  
+  showShareSuccess(message) {
+    const success = document.createElement('div');
+    success.style.cssText = `
+      position: fixed; top: 20px; right: 20px; z-index: 1000;
+      background: var(--correct); color: #000; padding: 1rem;
+      border-radius: 6px; font-weight: 600;
+    `;
+    success.textContent = message;
+    document.body.appendChild(success);
+    
+    setTimeout(() => success.remove(), 3000);
   }
 }
 
