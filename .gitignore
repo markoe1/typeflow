@@ -1,0 +1,31 @@
+# OS files
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+Desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Environment / secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Build artifacts
+dist/
+build/
+node_modules/
+
+# Claude / AI tooling
+.claude/
+.cagent/
