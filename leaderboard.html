@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TypeFlow Leaderboard - Top Typing Speeds</title>
-    <meta name="description" content="Track your personal typing speed records on TypeFlow. Save your best WPM scores and watch your progress over time.">
+    <title>Typing Speed Leaderboard | SpeedyTyper - Top WPM Scores</title>
+    <meta name="description" content="Track your personal typing speed records on SpeedyTyper. Save your best WPM scores, compete with yourself, and watch your progress over time.">
+    <link rel="canonical" href="https://speedytyper.com/leaderboard.html">
     
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHB7GDRCB2"></script>
@@ -26,7 +27,7 @@
     <nav class="navbar">
         <a href="index.html" class="nav-brand">
             <span class="icon">⌨️</span>
-            <span>TypeFlow</span>
+            <span>SpeedyTyper</span>
         </a>
         
         <div class="nav-links">
@@ -47,8 +48,8 @@
     <div class="container">
         <!-- Hero Section -->
         <div class="hero">
-            <h1>🏆 TypeFlow Leaderboard</h1>
-            <p>The fastest typists on TypeFlow. Think you can make the top 10?</p>
+            <h1>🏆 SpeedyTyper Leaderboard</h1>
+            <p>The fastest typists on SpeedyTyper. Think you can make the top 10?</p>
         </div>
 
         <!-- Add Score Section -->
@@ -129,7 +130,7 @@
             }
             
             getScores() {
-                const saved = localStorage.getItem('typeflow-leaderboard');
+                const saved = localStorage.getItem('SpeedyTyper-leaderboard');
                 const scores = saved ? JSON.parse(saved) : [];
                 
                 // Add some demo scores if empty
@@ -148,7 +149,7 @@
             }
             
             saveScores(scores) {
-                localStorage.setItem('typeflow-leaderboard', JSON.stringify(scores));
+                localStorage.setItem('SpeedyTyper-leaderboard', JSON.stringify(scores));
             }
             
             addScore() {

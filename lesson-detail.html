@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta name="google-adsense-account" content="ca-pub-3527398386713452">
@@ -14,9 +14,9 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TypeFlow - Lesson</title>
-    <meta name="description" content="Master typing fundamentals with structured lessons designed to build muscle memory and improve accuracy.">
-    
+    <title>Touch Typing Lesson | SpeedyTyper - Build Muscle Memory</title>
+    <meta name="description" content="Practice structured touch typing lessons on SpeedyTyper. Build muscle memory, improve finger placement, and reach 90% accuracy to unlock the next level.">
+    <link rel="canonical" href="https://speedytyper.com/lesson-detail.html">
     <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -25,7 +25,7 @@
     <nav class="navbar">
         <a href="index.html" class="nav-brand">
             <span class="icon">⌨️</span>
-            <span>TypeFlow</span>
+            <span>SpeedyTyper</span>
         </a>
         
         <div class="nav-links">
@@ -329,14 +329,14 @@
           }
           
           saveLessonProgress(accuracy) {
-            const progress = JSON.parse(localStorage.getItem('typeflow-lessons-progress') || '{"completed":[],"scores":{}}');
+            const progress = JSON.parse(localStorage.getItem('SpeedyTyper-lessons-progress') || '{"completed":[],"scores":{}}');
             progress.scores[this.currentLesson] = accuracy;
             
             if (accuracy >= 90 && !progress.completed.includes(this.currentLesson)) {
               progress.completed.push(this.currentLesson);
             }
             
-            localStorage.setItem('typeflow-lessons-progress', JSON.stringify(progress));
+            localStorage.setItem('SpeedyTyper-lessons-progress', JSON.stringify(progress));
           }
           
           goToNextLesson() {
