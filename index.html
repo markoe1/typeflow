@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta name="google-adsense-account" content="ca-pub-3527398386713452">
@@ -26,104 +26,102 @@
       "description": "Free online typing speed test. Measure your WPM, improve accuracy, and learn touch typing with 8 structured lessons.",
       "applicationCategory": "EducationalApplication",
       "operatingSystem": "Web",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
     }
     </script>
-
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
         <a href="index.html" class="nav-brand">
             <span class="icon">⌨️</span>
             <span>SpeedyTyper</span>
         </a>
-        
         <div class="nav-links">
             <a href="index.html" class="nav-link active">Test</a>
             <a href="practice.html" class="nav-link">Practice</a>
             <a href="lessons.html" class="nav-link">Lessons</a>
         </div>
-        
-        <div class="theme-selector">
-            <button class="theme-btn theme-dark" data-theme="dark" title="Dark Theme"></button>
-            <button class="theme-btn theme-light" data-theme="light" title="Light Theme"></button>
-            <button class="theme-btn theme-retro" data-theme="retro" title="Retro Theme"></button>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div class="theme-selector">
+                <button class="theme-btn theme-dark"  data-theme="dark"  title="Dark"></button>
+                <button class="theme-btn theme-light" data-theme="light" title="Light"></button>
+                <button class="theme-btn theme-retro" data-theme="retro" title="Retro"></button>
+            </div>
+            <button id="navProBtn" class="btn primary" onclick="openProCheckout()" style="font-size:11px;padding:5px 12px;">Go Pro</button>
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="container">
-        <!-- Hero Section -->
-        <div class="hero">
-            <h1>Test Your <span class="highlight">Typing Speed</span></h1>
-            <p>Choose your difficulty, set the timer, and start typing. See how fast you really are.</p>
-        </div>
 
-        <!-- AdSense Leaderboard -->
-        <div class="ad-unit ad-leaderboard">
-            <!-- AdSense 728x90 -->
-        </div>
+        <div class="ad-unit ad-leaderboard"></div>
 
         <!-- Controls -->
         <div class="controls">
-            <!-- Mode Toggle -->
+
+            <!-- Mode -->
             <div class="control-group">
-                <button class="toggle active" data-mode="time" id="timeMode">Time</button>
-                <button class="toggle" data-mode="words" id="wordsMode">Words</button>
+                <button class="toggle active" id="timeMode">Time</button>
+                <button class="toggle"        id="wordsMode">Words</button>
+                <button class="toggle"        id="quotesMode">Quotes</button>
             </div>
 
-            <!-- Time Options -->
+            <!-- Time options -->
             <div class="control-group" id="timeOptions">
-                <button class="toggle" data-time="15">15s</button>
+                <button class="toggle"        data-time="15">15s</button>
                 <button class="toggle active" data-time="30">30s</button>
-                <button class="toggle" data-time="60">60s</button>
-                <button class="toggle" data-time="120">120s</button>
+                <button class="toggle"        data-time="60">60s</button>
+                <button class="toggle"        data-time="120">120s</button>
             </div>
 
-            <!-- Word Options -->
+            <!-- Word options -->
             <div class="control-group hidden" id="wordOptions">
-                <button class="toggle" data-words="10">10</button>
+                <button class="toggle"        data-words="10">10</button>
                 <button class="toggle active" data-words="25">25</button>
-                <button class="toggle" data-words="50">50</button>
-                <button class="toggle" data-words="100">100</button>
+                <button class="toggle"        data-words="50">50</button>
+                <button class="toggle"        data-words="100">100</button>
             </div>
 
             <!-- Difficulty -->
-            <div class="control-group">
-                <button class="toggle" data-difficulty="easy">Easy</button>
+            <div class="control-group" id="difficultyOptions">
+                <button class="toggle"        data-difficulty="easy">Easy</button>
                 <button class="toggle active" data-difficulty="medium">Medium</button>
-                <button class="toggle" data-difficulty="hard">Hard</button>
+                <button class="toggle"        data-difficulty="hard">Hard</button>
             </div>
 
-            <!-- Reset -->
-            <button class="reset-btn" id="resetBtn" title="Reset">🔄</button>
+            <!-- Modifiers (punctuation / numbers) -->
+            <div class="control-group" id="modifierOptions">
+                <button class="toggle" id="punctuationToggle" title="Add punctuation">,. !?</button>
+                <button class="toggle" id="numbersToggle"     title="Add numbers">123</button>
+            </div>
+
+            <button class="reset-btn" id="resetBtn" title="Reset (Tab)">↺</button>
         </div>
 
-        <!-- Timer Display -->
+        <!-- Timer + live WPM -->
         <div class="timer">
             <div class="timer-display" id="timerDisplay">30</div>
             <p>seconds</p>
+            <div id="liveWpm" style="font-size:14px;color:var(--text-secondary,#aaa);margin-top:4px;min-height:20px;"></div>
         </div>
 
         <!-- Typing Area -->
         <div class="typing-card" id="typingCard">
-            <div class="typing-text" id="typingText">
-                <span class="char">c</span><span class="char">l</span><span class="char">i</span><span class="char">c</span><span class="char">k</span><span class="char"> </span><span class="char">h</span><span class="char">e</span><span class="char">r</span><span class="char">e</span><span class="char"> </span><span class="char">t</span><span class="char">o</span><span class="char"> </span><span class="char">s</span><span class="char">t</span><span class="char">a</span><span class="char">r</span><span class="char">t</span>
-            </div>
-            <input type="text" class="typing-input" id="typingInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <div class="typing-text" id="typingText"></div>
+            <input type="text" class="typing-input" id="typingInput"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
 
-        <!-- Results Screen -->
+        <!-- Tab hint -->
+        <div id="tabHint" style="text-align:center;font-size:11px;color:var(--text-secondary,#666);margin-top:6px;">
+            press <kbd style="background:var(--bg-card,#222);border:1px solid var(--border,#444);border-radius:3px;padding:1px 5px;">Tab</kbd> to restart
+        </div>
+
+        <!-- Results -->
         <div class="results hide" id="results">
             <div class="wpm-display" id="wpmResult">0</div>
             <p>Words Per Minute</p>
-            
+            <div id="pbResult" style="font-size:14px;margin-bottom:12px;font-weight:700;"></div>
             <div class="stats">
                 <div class="stat">
                     <div class="stat-value" id="accuracyResult">0%</div>
@@ -142,37 +140,29 @@
                     <div class="stat-label">Errors</div>
                 </div>
             </div>
-            
             <button class="btn primary" id="tryAgainBtn">Try Again</button>
         </div>
 
-        <!-- AdSense Rectangle (after results) -->
-        <div class="ad-unit ad-rectangle">
-            <!-- AdSense 300x250 -->
-        </div>
+        <div class="ad-unit ad-rectangle"></div>
 
-        <!-- Action Cards -->
         <div class="action-cards">
             <a href="lessons.html" class="action-card">
                 <span class="icon">📚</span>
                 <h3>Typing Lessons</h3>
-                <p>Learn proper finger placement and build real muscle memory with structured lessons.</p>
+                <p>Learn proper finger placement and build muscle memory with structured lessons.</p>
             </a>
             <a href="practice.html" class="action-card">
                 <span class="icon">⚡</span>
                 <h3>Practice Mode</h3>
-                <p>No timer, no pressure. Just pure practice to sharpen your typing skills at your pace.</p>
+                <p>No timer, no pressure. Pure practice to sharpen your typing skills.</p>
             </a>
         </div>
 
-        <!-- AdSense Footer Banner -->
-        <div class="ad-unit ad-leaderboard">
-            <!-- AdSense 728x90 -->
-        </div>
+        <div class="ad-unit ad-leaderboard"></div>
     </div>
 
-    <!-- Scripts -->
     <script src="js/themes.js"></script>
+    <script src="js/paddle.js"></script>
     <script src="js/typing-test.js"></script>
 </body>
 </html>
