@@ -1,23 +1,16 @@
-// TypeFlow — Paddle Billing Integration
+// SpeedyTyper — Whop Billing Integration
 // ─────────────────────────────────────────────────────────────────────────────
-// SETUP: Fill in the two values below from your Paddle dashboard.
+// SETUP: Fill in the value below after creating your product on Whop.
 //
-//   1. Go to paddle.com → Developer → Authentication
-//      Copy your "Client-side token" (starts with live_ or sandbox_)
-//      Paste it as PADDLE_CLIENT_TOKEN below.
-//
-//   2. Go to Paddle → Catalog → Products → Create "TypeFlow Pro"
-//      Set price: e.g. $4.99/month or $29/year (one-time)
-//      Click the price → copy the Price ID (starts with pri_)
-//      Paste it as PADDLE_PRICE_ID below.
-//
-//   3. For testing first: use a sandbox token (test_ prefix) and test price ID.
-//      Change PADDLE_ENV to 'sandbox' while testing.
+//   1. Go to whop.com/sell → create "SpeedyTyper Pro" product
+//   2. Set your price (e.g. $4.99/mo or $29 one-time)
+//   3. Copy the checkout URL (looks like https://whop.com/checkout/plan_xxx/)
+//   4. Paste it as WHOP_CHECKOUT_URL below.
+//   5. In Whop dashboard → set the success redirect URL to:
+//      https://speedytyper.com/lessons.html?pro=activated
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PADDLE_CLIENT_TOKEN = 'YOUR_CLIENT_SIDE_TOKEN'; // e.g. live_abc123...
-const PADDLE_PRICE_ID     = 'YOUR_PRICE_ID';          // e.g. pri_abc123...
-const PADDLE_ENV          = 'production';              // 'sandbox' or 'production'
+const WHOP_CHECKOUT_URL = 'YOUR_WHOP_CHECKOUT_URL'; // e.g. https://whop.com/checkout/plan_abc123/
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pro status helpers — stored in localStorage
@@ -36,7 +29,7 @@ function setProActive(transactionId) {
   localStorage.setItem('typeflow-pro', JSON.stringify({
     active: true,
     activatedAt: new Date().toISOString(),
-    transactionId: transactionId || 'manual'
+    transactionId: transactionId || 'whop'
   }));
 }
 
@@ -45,48 +38,35 @@ function clearPro() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Paddle initialization
-// ─────────────────────────────────────────────────────────────────────────────
-
-function initPaddle() {
-  if (typeof Paddle === 'undefined') return;
-
-  if (PADDLE_ENV === 'sandbox') {
-    Paddle.Environment.set('sandbox');
-  }
-
-  Paddle.Initialize({
-    token: PADDLE_CLIENT_TOKEN,
-    eventCallback: function (data) {
-      if (data.name === 'checkout.completed') {
-        const txId = data.data && data.data.transaction_id;
-        setProActive(txId);
-        hidePaddleOverlay();
-        showProSuccessMessage();
-        updateNavForPro();
-        // If on lessons page, refresh the lesson grid
-        if (window.lessonsManager) {
-          window.lessonsManager.renderLessons();
-        }
-        // Hide all ads for this session
-        hideAdsForPro();
-      }
-    }
-  });
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Open checkout
+// Open Whop checkout
 // ─────────────────────────────────────────────────────────────────────────────
 
 function openProCheckout() {
-  if (typeof Paddle === 'undefined') {
-    alert('Payment system loading. Please try again in a moment.');
+  if (!WHOP_CHECKOUT_URL || WHOP_CHECKOUT_URL === 'YOUR_WHOP_CHECKOUT_URL') {
+    alert('Checkout coming soon!');
     return;
   }
-  Paddle.Checkout.open({
-    items: [{ priceId: PADDLE_PRICE_ID, quantity: 1 }]
-  });
+  window.location.href = WHOP_CHECKOUT_URL;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Handle Whop success redirect
+// Whop sends users back to: /lessons.html?pro=activated
+// ─────────────────────────────────────────────────────────────────────────────
+
+function checkWhopReturn() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('pro') === 'activated') {
+    setProActive('whop');
+    // Clean the URL so it doesn't re-trigger on refresh
+    history.replaceState({}, '', window.location.pathname);
+    showProSuccessMessage();
+    updateNavForPro();
+    hideAdsForPro();
+    if (window.lessonsManager) {
+      window.lessonsManager.renderLessons();
+    }
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -106,7 +86,7 @@ function showProSuccessMessage() {
     padding: 1rem 1.5rem; border-radius: 8px; font-weight: 700;
     font-size: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   `;
-  msg.textContent = 'TypeFlow Pro activated! All lessons unlocked.';
+  msg.textContent = 'SpeedyTyper Pro activated! All lessons unlocked.';
   document.body.appendChild(msg);
   setTimeout(() => msg.remove(), 5000);
 }
@@ -133,7 +113,7 @@ function hideAdsForPro() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', function () {
-  initPaddle();
+  checkWhopReturn();
   updateNavForPro();
   hideAdsForPro();
 });
