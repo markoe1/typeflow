@@ -74,8 +74,38 @@ class LessonsManager {
   }
 
   unlockLesson(lessonCard, lessonNumber) {
+    // Lessons 5-8 require Pro
+    if (lessonNumber >= 5 && typeof isProUser === 'function' && !isProUser()) {
+      lessonCard.classList.remove('locked');
+      lessonCard.classList.add('pro-locked');
+
+      // Make it a non-navigating div with Pro badge
+      let proCard = lessonCard;
+      if (lessonCard.tagName.toLowerCase() === 'a') {
+        const newDiv = document.createElement('div');
+        newDiv.className = lessonCard.className;
+        newDiv.dataset.lesson = lessonNumber;
+        newDiv.innerHTML = lessonCard.innerHTML;
+        lessonCard.parentNode.replaceChild(newDiv, lessonCard);
+        proCard = newDiv;
+      }
+      proCard.style.cursor = 'pointer';
+      proCard.onclick = () => { if (typeof openProCheckout === 'function') openProCheckout(); };
+
+      const numberElement = proCard.querySelector('.lesson-number');
+      const arrowElement  = proCard.querySelector('.lesson-arrow');
+      const titleElement  = proCard.querySelector('.lesson-title');
+
+      if (numberElement) numberElement.textContent = lessonNumber;
+      if (arrowElement)  arrowElement.innerHTML = '<span style="font-size:0.75rem;background:var(--accent-primary,#f59e0b);color:#000;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:0.05em;">PRO</span>';
+      if (titleElement && !titleElement.querySelector('.pro-badge')) {
+        titleElement.innerHTML += ' <span class="pro-badge" style="font-size:0.7rem;background:var(--accent-primary,#f59e0b);color:#000;padding:1px 5px;border-radius:3px;font-weight:700;vertical-align:middle;">PRO</span>';
+      }
+      return;
+    }
+
     lessonCard.classList.remove('locked');
-    
+
     // Update the link
     if (lessonCard.tagName.toLowerCase() !== 'a') {
       const newLink = document.createElement('a');
@@ -86,19 +116,20 @@ class LessonsManager {
       lessonCard.parentNode.replaceChild(newLink, lessonCard);
       lessonCard = newLink;
     }
-    
+
     // Update the number display
     const numberElement = lessonCard.querySelector('.lesson-number');
-    const arrowElement = lessonCard.querySelector('.lesson-arrow');
-    
+    const arrowElement  = lessonCard.querySelector('.lesson-arrow');
+
     if (numberElement) {
       numberElement.textContent = lessonNumber;
     }
-    
+
     if (arrowElement) {
       arrowElement.textContent = '→';
     }
   }
+
 
   lockLesson(lessonCard, lessonNumber) {
     lessonCard.classList.add('locked');

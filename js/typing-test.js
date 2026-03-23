@@ -118,6 +118,31 @@ class TypingTest {
       "That which does not kill us makes us stronger.",
       "In three words I can sum up everything I have learned about life: it goes on.",
       "To be yourself in a world that is constantly trying to make you something else is the greatest accomplishment.",
+      "Strive not to be a success but rather to be of value.",
+      "You only live once, but if you do it right, once is enough.",
+      "In order to succeed we must first believe that we can.",
+      "The mind is everything. What you think you become.",
+      "The best revenge is massive success.",
+      "I have not failed. I have just found ten thousand ways that will not work.",
+      "A person who never made a mistake never tried anything new.",
+      "The secret of getting ahead is getting started.",
+      "It always seems impossible until it is done.",
+      "Do one thing every day that scares you.",
+      "Well done is better than well said.",
+      "The harder the conflict the more glorious the triumph.",
+      "What we think we become.",
+      "First they ignore you, then they laugh at you, then they fight you, then you win.",
+      "You become what you believe.",
+      "Not how long but how well you have lived is the main thing.",
+      "Knowing is not enough we must apply. Wishing is not enough we must do.",
+      "The two most important days in your life are the day you are born and the day you find out why.",
+      "Nothing is impossible the word itself says I am possible.",
+      "Life itself is the most wonderful fairy tale.",
+      "May you live all the days of your life.",
+      "Happiness is not something ready made. It comes from your own actions.",
+      "When everything seems to be going against you remember that the airplane takes off against the wind.",
+      "Too many of us are not living our dreams because we are living our fears.",
+      "If you want to achieve greatness stop asking for permission.",
     ];
 
     this.init();
@@ -414,9 +439,13 @@ class TypingTest {
 
   checkPersonalBest() {
     const key = `${this.currentMode}-${this.currentMode === 'time' ? this.currentTime : this.currentWords}-${this.currentDifficulty}`;
-    const prev = this.personalBest[key] || 0;
-    if (this.results.wpm > prev) {
-      this.personalBest[key] = this.results.wpm;
+    const existing = this.personalBest[key];
+    const prevWpm  = existing ? (typeof existing === 'object' ? existing.wpm : existing) : 0;
+    if (this.results.wpm > prevWpm) {
+      this.personalBest[key] = {
+        wpm:  this.results.wpm,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      };
       localStorage.setItem('speedytyper-pb', JSON.stringify(this.personalBest));
       this.isNewPB = true;
     } else {
@@ -436,12 +465,16 @@ class TypingTest {
 
     // Personal best display
     if (this.elements.pbResult) {
-      const pb = this.personalBest[this.currentPBKey] || this.results.wpm;
+      const pbData  = this.personalBest[this.currentPBKey];
+      const pbWpm   = pbData ? (typeof pbData === 'object' ? pbData.wpm : pbData) : this.results.wpm;
+      const pbDate  = (pbData && typeof pbData === 'object' && pbData.date) ? pbData.date : null;
       if (this.isNewPB) {
-        this.elements.pbResult.textContent = '🏆 New Personal Best!';
+        const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        this.elements.pbResult.innerHTML = `🏆 <strong>New Personal Best!</strong> &nbsp;·&nbsp; ${today}`;
         this.elements.pbResult.style.color = 'var(--correct, #00c853)';
       } else {
-        this.elements.pbResult.textContent = `Best: ${pb} wpm`;
+        const dateStr = pbDate ? ` · set ${pbDate}` : '';
+        this.elements.pbResult.textContent = `Best: ${pbWpm} wpm${dateStr}`;
         this.elements.pbResult.style.color = 'var(--text-secondary, #aaa)';
       }
     }
@@ -501,12 +534,11 @@ class TypingTest {
   }
 
   shareScore() {
-    const text = `⌨️ I just typed ${this.results.wpm} WPM with ${this.results.accuracy}% accuracy on SpeedyTyper!\n\nCan you beat it? Free at speedytyper.com\n\n#SpeedyTyper #typing #WPM`;
-    if (navigator.share) {
-      navigator.share({ title: 'My SpeedyTyper Score', text, url: 'https://speedytyper.com' }).catch(() => this.copyShare(text));
-    } else {
-      this.copyShare(text);
-    }
+    const tweetText = encodeURIComponent(
+      `I just typed ${this.results.wpm} WPM with ${this.results.accuracy}% accuracy on SpeedyTyper! 🎯 speedytyper.com`
+    );
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+    window.open(twitterUrl, '_blank', 'noopener,noreferrer');
   }
 
   copyShare(text) {
