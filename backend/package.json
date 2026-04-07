@@ -1,0 +1,22 @@
+{
+  "name": "typeflow-admin-backend",
+  "version": "1.0.0",
+  "description": "TypeFlow/SpeedyTyper admin backend - earnings & analytics",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "google-auth-library": "^9.4.1",
+    "googleapis": "^118.0.0",
+    "axios": "^1.6.0"
+  },
+  "engines": {
+    "node": "18.0.0"
+  }
+}

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeFlow Admin — Earnings & Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0ea5e9;
+        }
+
+        .auth-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .auth-section input {
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .auth-section input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0284c7;
+            transform: translateY(-2px);
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .auth-form {
+            display: none;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .auth-form.show {
+            display: block;
+        }
+
+        .auth-form h2 {
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 15px;
+        }
+
+        .error {
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.show {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.2s;
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(14, 165, 233, 0.3);
+        }
+
+        .card h3 {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0ea5e9;
+            margin-bottom: 8px;
+        }
+
+        .card .subtext {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .status-ok {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 40px 0 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .integration-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .integration-item {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .integration-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 8px;
+        }
+
+        .integration-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.15);
+            border-top-color: #0ea5e9;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .info-box {
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            color: #7dd3fc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="nav-title">⚙️ SpeedyTyper Admin</div>
+            <div class="auth-section">
+                <span id="userEmail" style="display: none; font-size: 14px; color: rgba(255,255,255,0.6);"></span>
+                <button class="btn btn-logout" id="logoutBtn" onclick="logout()" style="display: none;">Log Out</button>
+                <button class="btn btn-primary" id="loginBtn" onclick="showLoginForm()" style="display: block;">Admin Login</button>
+            </div>
+        </nav>
+
+        <!-- Auth Form -->
+        <div class="auth-form" id="authForm">
+            <h2>Admin Access</h2>
+            <div class="info-box">
+                💡 Enter your admin credentials to view earnings and verify AdSense/Analytics integration.
+            </div>
+            <div class="form-group">
+                <label>Admin Email</label>
+                <input type="email" id="authEmail" placeholder="admin@speedytyper.com" />
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="authPassword" placeholder="••••••••" />
+            </div>
+            <button class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="login()">
+                Sign In
+            </button>
+            <div class="error" id="authError"></div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboard">
+            <div id="dashboardContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let adminToken = localStorage.getItem('typeflow_admin_token');
+
+        // Boot
+        (async function boot() {
+            if (adminToken) {
+                showDashboard();
+                loadDashboard();
+            } else {
+                showLoginForm();
+            }
+        })();
+
+        // Auth
+        function showLoginForm() {
+            document.getElementById('authForm').classList.add('show');
+            document.getElementById('dashboard').classList.remove('show');
+            document.getElementById('loginBtn').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('userEmail').style.display = 'none';
+        }
+
+        async function login() {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value;
+            const error = document.getElementById('authError');
+
+            if (!email || !password) {
+                error.textContent = 'Email and password required';
+                return;
+            }
+
+            // For now, simple authentication with known credentials
+            // In production, this would validate against a real backend
+            if (email === 'admin@speedytyper.com' && password === 'speedytyper2024') {
+                // Generate admin token and set backend URL
+                adminToken = 'admin_token_' + Math.random().toString(36).substr(2, 9);
+
+                // Store credentials and backend info
+                localStorage.setItem('typeflow_admin_token', adminToken);
+                localStorage.setItem('typeflow_admin_api_key', 'YOUR_ADMIN_API_KEY_HERE');
+                localStorage.setItem('typeflow_backend_url', 'http://localhost:3001');
+
+                document.getElementById('userEmail').textContent = email;
+                showDashboard();
+                loadDashboard();
+            } else {
+                error.textContent = 'Invalid credentials';
+            }
+        }
+
+        function logout() {
+            adminToken = null;
+            localStorage.removeItem('typeflow_admin_token');
+            showLoginForm();
+        }
+
+        // Dashboard
+        function showDashboard() {
+            document.getElementById('authForm').classList.remove('show');
+            document.getElementById('dashboard').classList.add('show');
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'block';
+            document.getElementById('userEmail').style.display = 'block';
+        }
+
+        async function loadDashboard() {
+            const content = document.getElementById('dashboardContent');
+            content.innerHTML = '<div class="loading"><div class="spinner"></div>Loading AdSense & Analytics data...</div>';
+
+            try {
+                // Get API key from localStorage (set during login)
+                const apiKey = localStorage.getItem('typeflow_admin_api_key');
+                if (!apiKey) {
+                    content.innerHTML = '<div class="error-message">API key not found. Please log in again.</div>';
+                    return;
+                }
+
+                // Backend URL (adjust for your deployment)
+                const BACKEND_URL = localStorage.getItem('typeflow_backend_url') || 'http://localhost:3001';
+
+                // Fetch earnings
+                const earningsRes = await fetch(`${BACKEND_URL}/api/earnings`, {
+                    headers: { 'X-Admin-Key': apiKey }
+                });
+                const earningsData = earningsRes.ok ? await earningsRes.json() : { error: 'Failed to fetch earnings' };
+
+                // Fetch analytics
+                const analyticsRes = await fetch(`${BACKEND_URL}/api/analytics`, {
+                    headers: { 'X-Admin-Key': apiKey }
+                });
+                const analyticsData = analyticsRes.ok ? await analyticsRes.json() : { error: 'Failed to fetch analytics' };
+
+                // Fetch status
+                const statusRes = await fetch(`${BACKEND_URL}/api/status`, {
+                    headers: { 'X-Admin-Key': apiKey }
+                });
+                const statusData = statusRes.ok ? await statusRes.json() : {};
+
+                // Fetch PayPal data
+                const paypalRes = await fetch(`${BACKEND_URL}/api/paypal`, {
+                    headers: { 'X-Admin-Key': apiKey }
+                });
+                const paypalData = paypalRes.ok ? await paypalRes.json() : { error: 'Failed to fetch PayPal data' };
+
+                const data = {
+                    earnings_today: earningsData.earnings_today || 0,
+                    earnings_month: earningsData.earnings_month || 0,
+                    impressions_month: earningsData.impressions_month || 0,
+                    pageviews_month: earningsData.pageviews_month || 0,
+                    ctr: earningsData.ctr || '0.00',
+
+                    visitors_today: analyticsData.visitors_today || 0,
+                    visitors_month: analyticsData.visitors_month || 0,
+                    pageviews_today: analyticsData.pageviews_today || 0,
+                    bounce_rate: analyticsData.bounce_rate_today || 0,
+
+                    adsense_verified: statusData.adsense_configured,
+                    analytics_verified: statusData.analytics_configured,
+                    paypal_verified: statusData.paypal_configured,
+
+                    paypal_total_received: paypalData.total_received_30d || 0,
+                    paypal_transactions: paypalData.transactions || [],
+                    paypal_account_email: paypalData.account_email || 'N/A',
+
+                    earnings_error: earningsData.error,
+                    analytics_error: analyticsData.error,
+                    paypal_error: paypalData.error,
+                    last_updated: new Date().toLocaleString()
+                };
+
+                content.innerHTML = renderDashboard(data);
+            } catch (e) {
+                content.innerHTML = `<div class="error-message">Error loading dashboard: ${e.message}</div>`;
+            }
+        }
+
+        function renderDashboard(data) {
+            return `
+                <div class="info-box">
+                    📌 <strong>Note:</strong> To enable real-time AdSense & Analytics data, configure Google APIs in a backend service. For now, this dashboard shows integration status only.
+                </div>
+
+                <div class="section-title">💰 AdSense Earnings</div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Today's Revenue</h3>
+                        <div class="value">$${data.earnings_today.toFixed(2)}</div>
+                        <div class="subtext">Last 24 hours</div>
+                    </div>
+                    <div class="card">
+                        <h3>30-Day Revenue</h3>
+                        <div class="value">$${data.earnings_month.toFixed(2)}</div>
+                        <div class="subtext">Last 30 days</div>
+                    </div>
+                    <div class="card">
+                        <h3>Impressions (30d)</h3>
+                        <div class="value">${data.impressions_month.toLocaleString()}</div>
+                        <div class="subtext">Ad views</div>
+                    </div>
+                    <div class="card">
+                        <h3>Page Views (30d)</h3>
+                        <div class="value">${data.pageviews_month.toLocaleString()}</div>
+                        <div class="subtext">Site traffic</div>
+                    </div>
+                </div>
+
+                <div class="section-title">📈 Google Analytics</div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Visitors Today</h3>
+                        <div class="value">${data.visitors_today.toLocaleString()}</div>
+                        <div class="subtext">Active users</div>
+                    </div>
+                    <div class="card">
+                        <h3>Visitors (30d)</h3>
+                        <div class="value">${data.visitors_month.toLocaleString()}</div>
+                        <div class="subtext">Last 30 days</div>
+                    </div>
+                    <div class="card">
+                        <h3>Page Views Today</h3>
+                        <div class="value">${data.pageviews_today.toLocaleString()}</div>
+                        <div class="subtext">Today's views</div>
+                    </div>
+                    <div class="card">
+                        <h3>Bounce Rate</h3>
+                        <div class="value">${data.bounce_rate.toFixed(1)}%</div>
+                        <div class="subtext">Today</div>
+                    </div>
+                </div>
+
+                <div class="section-title">💳 PayPal Payouts</div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Received (30d)</h3>
+                        <div class="value">$${data.paypal_total_received.toFixed(2)}</div>
+                        <div class="subtext">PayPal transfers</div>
+                    </div>
+                    <div class="card">
+                        <h3>Account</h3>
+                        <div class="value" style="font-size: 1.2rem;">${data.paypal_account_email}</div>
+                        <div class="subtext">Connected account</div>
+                    </div>
+                    <div class="card">
+                        <h3>Transactions</h3>
+                        <div class="value">${data.paypal_transactions.length}</div>
+                        <div class="subtext">Last 30 days</div>
+                    </div>
+                </div>
+                ${data.paypal_transactions.length > 0 ? `
+                    <div style="margin-top: 20px;">
+                        <h3 style="margin-bottom: 10px; font-size: 14px; color: rgba(255,255,255,0.6);">Recent Transactions</h3>
+                        ${data.paypal_transactions.slice(0, 5).map(t => `
+                            <div style="padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px; margin-bottom: 8px; font-size: 13px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>${new Date(t.date).toLocaleDateString()}</span>
+                                    <strong style="color: #0ea5e9;">+$${t.amount.toFixed(2)} ${t.currency}</strong>
+                                </div>
+                                <div style="color: rgba(255,255,255,0.4); font-size: 12px;">${t.type}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <div class="section-title">✅ Integration Status</div>
+                <div class="integration-grid">
+                    <div class="integration-item">
+                        <div class="integration-label">AdSense</div>
+                        <div class="integration-name">
+                            ${data.adsense_verified ? '✓ Connected' : '✗ Not configured'}
+                        </div>
+                        <span class="status-badge ${data.adsense_verified ? 'status-ok' : 'status-error'}">
+                            ${data.adsense_verified ? 'Active' : 'Setup required'}
+                        </span>
+                    </div>
+                    <div class="integration-item">
+                        <div class="integration-label">Google Analytics</div>
+                        <div class="integration-name">
+                            ${data.analytics_verified ? '✓ Connected' : '✗ Not configured'}
+                        </div>
+                        <span class="status-badge ${data.analytics_verified ? 'status-ok' : 'status-error'}">
+                            ${data.analytics_verified ? 'Active' : 'Setup required'}
+                        </span>
+                    </div>
+                    <div class="integration-item">
+                        <div class="integration-label">PayPal</div>
+                        <div class="integration-name">
+                            ${data.paypal_verified ? '✓ Connected' : '✗ Not configured'}
+                        </div>
+                        <span class="status-badge ${data.paypal_verified ? 'status-ok' : 'status-error'}">
+                            ${data.paypal_verified ? 'Active' : 'Setup required'}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    Last updated: ${data.last_updated}
+                    <br><br>
+                    <button class="btn btn-primary" onclick="loadDashboard()">
+                        🔄 Refresh Data
+                    </button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
