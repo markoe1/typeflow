@@ -3,14 +3,15 @@
 // SETUP: Fill in the value below after creating your product on Whop.
 //
 //   1. Go to whop.com/sell → create "SpeedyTyper Pro" product
-//   2. Set your price (e.g. $4.99/mo or $29 one-time)
+//   2. Set your price (e.g. $4.99/mo or $19 one-time)
 //   3. Copy the checkout URL (looks like https://whop.com/checkout/plan_xxx/)
 //   4. Paste it as WHOP_CHECKOUT_URL below.
 //   5. In Whop dashboard → set the success redirect URL to:
 //      https://speedytyper.com/lessons.html?pro=activated
 // ─────────────────────────────────────────────────────────────────────────────
 
-const WHOP_CHECKOUT_URL = 'YOUR_WHOP_CHECKOUT_URL'; // e.g. https://whop.com/checkout/plan_abc123/
+// Create product at whop.com/sell → copy checkout URL → paste here
+const WHOP_CHECKOUT_URL = 'REPLACE_WITH_WHOP_URL';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pro status helpers — stored in localStorage
@@ -42,8 +43,8 @@ function clearPro() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function openProCheckout() {
-  if (!WHOP_CHECKOUT_URL || WHOP_CHECKOUT_URL === 'YOUR_WHOP_CHECKOUT_URL') {
-    alert('Checkout coming soon!');
+  if (!WHOP_CHECKOUT_URL || WHOP_CHECKOUT_URL === 'REPLACE_WITH_WHOP_URL') {
+    alert('Pro checkout coming soon! Check back shortly.');
     return;
   }
   window.location.href = WHOP_CHECKOUT_URL;
@@ -58,7 +59,6 @@ function checkWhopReturn() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('pro') === 'activated') {
     setProActive('whop');
-    // Clean the URL so it doesn't re-trigger on refresh
     history.replaceState({}, '', window.location.pathname);
     showProSuccessMessage();
     updateNavForPro();
@@ -97,7 +97,7 @@ function updateNavForPro() {
   if (isProUser()) {
     btn.textContent = 'Pro Active';
     btn.classList.add('nav-pro-active');
-    btn.removeEventListener('click', openProCheckout);
+    btn.onclick = null;
   }
 }
 
