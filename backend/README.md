@@ -195,7 +195,7 @@ Set environment variables in Vercel dashboard.
 ### Option 2: Railway
 
 ```bash
-railway up
+render deploy
 ```
 
 ### Option 3: Heroku
