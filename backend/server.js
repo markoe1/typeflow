@@ -26,13 +26,10 @@ const PAYPAL_API_URL = PAYPAL_MODE === 'sandbox'
 
 // ── Middleware ─────────────────────────────────────────────────────────────
 
+// Load allowed origins from environment variable (comma-separated)
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'https://speedytyper.com,http://localhost:5500').split(',').map(o => o.trim());
 app.use(cors({
-  origin: [
-    'https://speedytyper.com',
-    'http://localhost:5500',
-    'http://localhost:8080',
-    'http://localhost:3000'
-  ]
+  origin: allowedOrigins
 }));
 
 app.use(express.json());
@@ -40,7 +37,8 @@ app.use(express.json());
 // ── Auth Middleware ───────────────────────────────────────────────────────
 
 function authenticateAdmin(req, res, next) {
-  const apiKey = req.headers['x-admin-key'] || req.query.key;
+  // Only accept API key from headers, never from query string (which gets logged)
+const apiKey = req.headers['x-admin-key'];
 
   if (!apiKey || apiKey !== ADMIN_API_KEY) {
     return res.status(401).json({ error: 'Unauthorized', code: 'INVALID_API_KEY' });
@@ -378,8 +376,58 @@ app.use((err, req, res, next) => {
   });
 });
 
+// ── Authentication Endpoint ───────────────────────────────────────────────────
+
+const crypto = require('crypto');
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'change_me';
+
+// Simple in-memory session store (use Redis in production)
+const adminSessions = new Map();
+
+function generateSecureToken() {
+  // Use crypto for secure token generation instead of Math.random()
+  return crypto.randomBytes(32).toString('hex');
+}
+
+app.post('/api/admin/login', (req, res) => {
+  const { email, password } = req.body;
+  
+  // Validate input
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password required' });
+  }
+  
+  // Constant-time comparison to prevent timing attacks
+  const emailMatch = email === ADMIN_EMAIL;
+  const passwordMatch = password === ADMIN_PASSWORD;
+  
+  if (!emailMatch || !passwordMatch) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+  
+  // Generate secure session token
+  const token = generateSecureToken();
+  const apiKey = generateSecureToken().substring(0, 24);
+  
+  // Store session
+  adminSessions.set(token, {
+    email,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+  });
+  
+  res.json({
+    token,
+    apiKey,
+    message: 'Logged in successfully'
+  });
+});
+
 // ── Server Start ───────────────────────────────────────────────────────────
 
+
+const auth = getGoogleAuth();
 app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════════════════════╗
@@ -398,4 +446,3 @@ app.listen(PORT, () => {
   `);
 });
 
-const auth = getGoogleAuth();

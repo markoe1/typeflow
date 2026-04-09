@@ -85,6 +85,7 @@ class LessonsManager {
         const newDiv = document.createElement('div');
         newDiv.className = lessonCard.className;
         newDiv.dataset.lesson = lessonNumber;
+      // SECURITY: Using innerHTML - ensure no user-controlled data is injected
         newDiv.innerHTML = lessonCard.innerHTML;
         lessonCard.parentNode.replaceChild(newDiv, lessonCard);
         proCard = newDiv;
@@ -97,8 +98,10 @@ class LessonsManager {
       const titleElement  = proCard.querySelector('.lesson-title');
 
       if (numberElement) numberElement.textContent = lessonNumber;
+      // SECURITY: Using innerHTML - ensure no user-controlled data is injected
       if (arrowElement)  arrowElement.innerHTML = '<span style="font-size:0.75rem;background:var(--accent-primary,#f59e0b);color:#000;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:0.05em;">PRO</span>';
       if (titleElement && !titleElement.querySelector('.pro-badge')) {
+      // SECURITY: Using innerHTML - ensure no user-controlled data is injected
         titleElement.innerHTML += ' <span class="pro-badge" style="font-size:0.7rem;background:var(--accent-primary,#f59e0b);color:#000;padding:1px 5px;border-radius:3px;font-weight:700;vertical-align:middle;">PRO</span>';
       }
       return;
@@ -112,6 +115,7 @@ class LessonsManager {
       newLink.href = `lesson-detail.html?lesson=${lessonNumber}`;
       newLink.className = lessonCard.className;
       newLink.dataset.lesson = lessonNumber;
+      // SECURITY: Using innerHTML - ensure no user-controlled data is injected
       newLink.innerHTML = lessonCard.innerHTML;
       lessonCard.parentNode.replaceChild(newLink, lessonCard);
       lessonCard = newLink;
@@ -139,6 +143,7 @@ class LessonsManager {
       const newDiv = document.createElement('div');
       newDiv.className = lessonCard.className;
       newDiv.dataset.lesson = lessonNumber;
+      // SECURITY: Using innerHTML - ensure no user-controlled data is injected
       newDiv.innerHTML = lessonCard.innerHTML;
       lessonCard.parentNode.replaceChild(newDiv, lessonCard);
       lessonCard = newDiv;
@@ -166,7 +171,10 @@ class LessonsManager {
     // Optionally show the score
     const titleElement = lessonCard.querySelector('.lesson-title');
     if (titleElement && score >= this.masteryThreshold) {
-      titleElement.innerHTML += ` <span class="completion-badge">✓ ${score}%</span>`;
+      const badge = document.createElement('span');
+      badge.className = 'completion-badge';
+      badge.textContent = '✓ ' + score + '%';
+      titleElement.appendChild(badge);
     }
   }
 
