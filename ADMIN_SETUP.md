@@ -110,8 +110,8 @@ Set environment variables in Vercel dashboard.
 
 **Railway:**
 ```bash
-npm install -g @railway/cli
-railway up
+# Use Render CLI
+render deploy
 ```
 
 **Self-hosted (VPS):**

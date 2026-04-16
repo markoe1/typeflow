@@ -20,7 +20,13 @@ class TypingTest {
     this.endTime           = null;
     this.currentText       = '';
     this.isNewPB           = false;
-    this.personalBest      = JSON.parse(localStorage.getItem('speedytyper-pb') || '{}');
+    try {
+      this.personalBest = JSON.parse(localStorage.getItem('speedytyper-pb') || '{}');
+    } catch (e) {
+      console.error('Failed to load personal best from storage:', e);
+      this.personalBest = {};
+      localStorage.removeItem('speedytyper-pb'); // Clear corrupted data
+    }
 
     // ── Word lists (200+ per tier) ──────────────────────────────────────────
     this.wordLists = {

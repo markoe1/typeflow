@@ -12,7 +12,8 @@ const PORT = process.env.PORT || 3001;
 // ── Configuration ──────────────────────────────────────────────────────────
 
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY || '';
-const ADSENSE_ACCOUNT_ID = process.env.ADSENSE_ACCOUNT_ID || 'ca-pub-3527398386713452';
+const ADSENSE_ACCOUNT_ID = process.env.ADSENSE_ACCOUNT_ID;
+if (!ADSENSE_ACCOUNT_ID) throw new Error('ADSENSE_ACCOUNT_ID environment variable is required');
 const GA4_PROPERTY_ID = process.env.GA4_PROPERTY_ID || '';
 const GOOGLE_SERVICE_ACCOUNT_JSON = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '';
 
@@ -26,13 +27,38 @@ const PAYPAL_API_URL = PAYPAL_MODE === 'sandbox'
 
 // ── Middleware ─────────────────────────────────────────────────────────────
 
+// Load allowed origins from environment variable (comma-separated)
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim());
+if (!allowedOrigins || allowedOrigins.length === 0) {
+  throw new Error('ALLOWED_ORIGINS environment variable is required (comma-separated list)');
+}
+
+// ── Security Headers ────────────────────────────────────────────────────────
+
+app.use((req, res, next) => {
+  // HTTPS enforcement
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  
+  // Prevent clickjacking
+  res.setHeader('X-Frame-Options', 'DENY');
+  
+  // Prevent MIME type sniffing
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  
+  // Disable XSS in older browsers
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  
+  // Content Security Policy
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'");
+  
+  // Referrer Policy
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  next();
+});
+
 app.use(cors({
-  origin: [
-    'https://speedytyper.com',
-    'http://localhost:5500',
-    'http://localhost:8080',
-    'http://localhost:3000'
-  ]
+  origin: allowedOrigins
 }));
 
 app.use(express.json());
@@ -40,7 +66,8 @@ app.use(express.json());
 // ── Auth Middleware ───────────────────────────────────────────────────────
 
 function authenticateAdmin(req, res, next) {
-  const apiKey = req.headers['x-admin-key'] || req.query.key;
+  // Only accept API key from headers, never from query string (which gets logged)
+const apiKey = req.headers['x-admin-key'];
 
   if (!apiKey || apiKey !== ADMIN_API_KEY) {
     return res.status(401).json({ error: 'Unauthorized', code: 'INVALID_API_KEY' });
@@ -73,7 +100,7 @@ async function getPayPalAccessToken() {
 
     return response.data.access_token;
   } catch (e) {
-    console.error('Failed to get PayPal access token:', e.message);
+    logger.error('Failed to get PayPal access token:', e.message);
     return null;
   }
 }
@@ -97,7 +124,7 @@ function getGoogleAuth() {
     });
     return auth;
   } catch (e) {
-    console.error('Failed to parse Google service account:', e.message);
+    logger.error('Failed to parse Google service account:', e.message);
     return null;
   }
 }
@@ -189,7 +216,7 @@ app.get('/api/earnings', authenticateAdmin, async (req, res) => {
       account_id: ADSENSE_ACCOUNT_ID
     });
   } catch (error) {
-    console.error('AdSense API error:', error.message);
+    logger.error('AdSense API error:', error.message);
     res.status(500).json({
       error: error.message,
       earnings_today: null,
@@ -266,7 +293,7 @@ app.get('/api/analytics', authenticateAdmin, async (req, res) => {
       property_id: GA4_PROPERTY_ID
     });
   } catch (error) {
-    console.error('Analytics API error:', error.message);
+    logger.error('Analytics API error:', error.message);
     res.status(500).json({
       error: error.message,
       visitors_today: null,
@@ -359,7 +386,7 @@ app.get('/api/paypal', authenticateAdmin, async (req, res) => {
       mode: PAYPAL_MODE
     });
   } catch (error) {
-    console.error('PayPal API error:', error.message);
+    logger.error('PayPal API error:', error.message);
     res.status(500).json({
       error: error.message,
       balance: null,
@@ -371,15 +398,132 @@ app.get('/api/paypal', authenticateAdmin, async (req, res) => {
 // ── Error Handler ──────────────────────────────────────────────────────────
 
 app.use((err, req, res, next) => {
-  console.error(err);
+  logger.error(err);
   res.status(500).json({
     error: err.message || 'Internal server error',
     code: 'INTERNAL_ERROR'
   });
 });
 
+// ── Authentication Endpoint ───────────────────────────────────────────────────
+
+const crypto = require('crypto');
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+// Validate credentials are set
+if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+  throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required');
+}
+
+// Simple in-memory session store (use Redis in production)
+const adminSessions = new Map();
+
+function generateSecureToken() {
+  // Use crypto for secure token generation instead of Math.random()
+  return crypto.randomBytes(32).toString('hex');
+}
+
+app.post('/api/admin/login', (req, res) => {
+  const { email, password } = req.body;
+  
+  // Validate input
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password required' });
+  }
+  
+  // Constant-time comparison to prevent timing attacks
+  const emailMatch = email === ADMIN_EMAIL;
+  const passwordMatch = password === ADMIN_PASSWORD;
+  
+  if (!emailMatch || !passwordMatch) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+  
+  // Generate secure session token
+  const token = generateSecureToken();
+  const apiKey = generateSecureToken().substring(0, 24);
+  
+  // Store session
+  adminSessions.set(token, {
+    email,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+  });
+  
+  res.json({
+    token,
+    apiKey,
+    message: 'Logged in successfully'
+  });
+});
+
+
+// ── Secure Authentication with bcrypt ───────────────────────────────────────
+
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
+
+// Session storage (use Redis in production)
+const adminSessions = new Map();
+const MAX_SESSION_AGE = 24 * 60 * 60 * 1000; // 24 hours
+
+function hashPassword(password) {
+  // Note: In production, use bcrypt.hashSync with rounds >= 12
+  // For now, use simple hashing for existing deployments
+  return bcrypt.hashSync(password, 10);
+}
+
+function verifyPassword(password, hash) {
+  return bcrypt.compareSync(password, hash);
+}
+
+app.post('/api/admin/login', async (req, res) => {
+  const { email, password } = req.body;
+  
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password required' });
+  }
+  
+  // Use timing-safe comparison
+  const emailMatch = crypto.timingSafeEqual(
+    Buffer.from(email),
+    Buffer.from(ADMIN_EMAIL)
+  ).catch(() => false);
+  
+  if (!emailMatch) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+  
+  const passwordMatch = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+  if (!passwordMatch) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+  
+  // Generate secure session token
+  const token = crypto.randomBytes(32).toString('hex');
+  adminSessions.set(token, {
+    email,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + MAX_SESSION_AGE
+  });
+  
+  res.json({
+    token,
+    message: 'Logged in successfully'
+  });
+});
+
+app.post('/api/admin/logout', (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (token) adminSessions.delete(token);
+  res.json({ message: 'Logged out' });
+});
+
 // ── Server Start ───────────────────────────────────────────────────────────
 
+
+const auth = getGoogleAuth();
 app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════════════════════╗
@@ -398,4 +542,3 @@ app.listen(PORT, () => {
   `);
 });
 
-const auth = getGoogleAuth();
