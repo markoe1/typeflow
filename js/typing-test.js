@@ -179,6 +179,9 @@ class TypingTest {
       tryAgainBtn:         document.getElementById('tryAgainBtn'),
       resetBtn:            document.getElementById('resetBtn'),
       tabHint:             document.getElementById('tabHint'),
+      shareTwitterBtn:     document.getElementById('shareTwitterBtn'),
+      shareLinkBtn:        document.getElementById('shareLinkBtn'),
+      startTestBtn:        document.getElementById('startTestBtn'),
     };
   }
 
@@ -240,6 +243,18 @@ class TypingTest {
         e.preventDefault();
         this.reset();
       }
+    });
+
+    // Share buttons
+    this.elements.shareTwitterBtn?.addEventListener('click', () => this.shareScore());
+    this.elements.shareLinkBtn?.addEventListener('click', () => {
+      const text = `I just typed ${this.results.wpm} WPM with ${this.results.accuracy}% accuracy on SpeedyTyper! Check it out: speedytyper.com`;
+      this.copyShare(text);
+    });
+
+    // Start test button
+    this.elements.startTestBtn?.addEventListener('click', () => {
+      this.elements.typingInput.focus();
     });
 
     setTimeout(() => this.elements.typingInput.focus(), 100);
